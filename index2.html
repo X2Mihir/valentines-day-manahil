@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Manahil | A 21-Day Journey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #ff2d55;
+            --bg: #000000;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: #fff;
+            overflow: hidden; 
+            scroll-behavior: smooth;
+        }
+
+        /* --- SCREENS (GATEKEEPERS) --- */
+        .gatekeeper {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100vh;
+            background: radial-gradient(circle at center, #2c0211 0%, #000 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: all 1s ease;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #password-screen { display: none; opacity: 0; }
+
+        h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(2.2rem, 8vw, 4.5rem);
+            margin-bottom: 30px;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255,45,85,0.8);
+        }
+
+        /* --- INPUT & BUTTONS --- */
+        .ask-btns { display: flex; gap: 30px; position: relative; width: 100%; justify-content: center; max-width: 400px; }
+
+        .choice-btn, .unlock-btn {
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #yes-btn, .unlock-btn { background: var(--accent); color: white; box-shadow: 0 0 20px rgba(255,45,85,0.4); }
+        #no-btn { background: #fff; color: #000; position: absolute; left: 55%; z-index: 10; }
+
+        .pass-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.2rem;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 20px;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+        .pass-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(255,45,85,0.3); }
+
+        /* --- MAIN CONTENT --- */
+        #main-content { opacity: 0; transition: opacity 2s ease; visibility: hidden; }
+        #canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .hero h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(3.5rem, 12vw, 6rem);
+            background: linear-gradient(to right, #ff758c, #ff2d55);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .container { max-width: 900px; margin: auto; padding: 40px 20px; }
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 40px;
+            padding: 40px;
+            margin: 60px 0;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        .poem-body {
+            font-family: 'Dancing Script', cursive;
+            font-size: clamp(1.4rem, 4vw, 1.9rem);
+            line-height: 1.6;
+            color: #ffeef2;
+            white-space: pre-line;
+            border-left: 3px solid var(--accent);
+            padding-left: 20px;
+        }
+
+        .overlay {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            z-index: 10000; pointer-events: none; transition: 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+        }
+        #kiss-overlay { font-size: 150px; }
+        #hug-overlay { font-size: 200px; filter: drop-shadow(0 0 30px #ff2d55); }
+
+        .glow-btn {
+            background: var(--accent); color: white; padding: 18px 35px;
+            border-radius: 100px; font-weight: 700; border: none; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+            margin: 10px; min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="ask-screen" class="gatekeeper">
+    <h2>Manahil, will you be my Valentine?</h2>
+    <div class="ask-btns">
+        <button id="yes-btn" class="choice-btn" onclick="showPasswordScreen()">YES</button>
+        <button id="no-btn" class="choice-btn" onmouseover="moveNo()" onclick="handleNoClick()">NO</button>
+    </div>
+</div>
+
+<div id="password-screen" class="gatekeeper">
+    <h2>Enter Secret Password</h2>
+    <p style="color: rgba(255,255,255,0.5); margin-bottom: 20px; font-size: 0.9rem;">Hint: Our special date + Forever</p>
+    <input type="password" id="passInput" class="pass-input" placeholder="The secret key...">
+    <button class="unlock-btn" onclick="checkPassword()">Unlock My Heart</button>
+</div>
+
+<div id="main-content">
+    <canvas id="canvas"></canvas>
+    <div id="kiss-overlay" class="overlay">💋</div>
+    <div id="hug-overlay" class="overlay">🫂</div>
+
+    <section class="hero">
+        <h1>To Manahil</h1>
+        <div id="countdown" style="margin-top:20px; opacity:0.7; letter-spacing:2px;"></div>
+    </section>
+
+    <div class="container">
+        <div class="glass-card">
+            <h2 style="font-size:2.5rem; margin-bottom:20px;">Three Weeks of Us</h2>
+            <ul style="list-style: none; color: #d1d1d6; font-size: 1.1rem; line-height: 2;">
+                <li>✦ Your laugh is my favorite sound.</li>
+                <li>✦ You look beautiful even without makeup.</li>
+                <li>✦ Your voice is amazing.</li>
+                <li>✦ Talking to you is the highlight of my day.</li>
+            </ul>
+        </div>
+
+        <div class="glass-card">
+            <p style="color:var(--accent); font-size:0.7rem; letter-spacing:4px; font-weight:700;">POEM I: JEALOUSY</p><br>
+            <div class="poem-body">
+           Tum meri har dua ka asar ho sanam,
+Tum se hi roshan mera har safar ho sanam.
+Tumhari hansi se khilta hai ye jahaan,
+Tum bin adhura sa lagta hai har jahaan.
+Tumhari baaton mein narmi ka hai nasha,
+Dil ko sukoon mile, mit jaaye har gila.
+Tumhari aankhon mein basi hai ek roshni,
+Jo raat ko bhi kar de subah si zindagi.
+Tum saath ho to har gham bhi geet lage,
+Tum door ho to khushi bhi pheeki si lage.
+Main likhta hoon khud ko tumhare naam par,
+Tum meri zindagi, tum hi mera qaraar.
+Agar pooche koi ishq kya hota hai,
+Main keh doon bas —
+Jo tum se hota hai, wahi ishq hota hai.
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <p style="color:var(--accent); font-size:0.7rem; letter-spacing:4px; font-weight:700;">POEM II: THE DISTANCE</p><br>
+            <div class="poem-body">
+                yeh sirf faaslon ki kahani nahin
+yeh un lamhon ka maatam hai
+jo hum baat kiye bina hi kho dete ja rahe hain
+main har roz tujhe yaad karta hoon
+jaise koi aadat jo chhoot’ti nahin
+aur tu
+shayad mujhe bhoolne ki mashq mein hai
+itni khamoshi ke saath
+ke dard bhi awaaz nahin karta
+main tera intezaar karta hoon
+jaise raat subah ka karti hai
+par subah aati toh hai
+tu nahin aati
+na paighaam
+na khayal
+na woh bechaini jo kabhi sirf meri hoti thi
+hum dono ek hi kahani mein thay
+par ab
+main us safhe par atka hoon
+jahan tera naam likha tha
+aur tu aage badh chuki hai
+bina mud ke dekhe
+sab kehte hain faasle waqt ke saath kam ho jaate hain
+par sach yeh hai
+jab baat band ho jaaye
+toh dil sab se pehle chup hota hai
+aur phir dheere dheere
+pyaar bhi thak jaata hai
+agar tu pooche kabhi
+ke hum kahan kho gaye
+toh kehna
+hum wahin thay
+jahan tumne mujhe miss karna chhod diya
+aur maine tumhe chhodna seekha hi nahin
+            </div>
+        </div>
+
+        <div class="glass-card" style="text-align: center;">
+            <h2 style="margin-bottom: 30px;">Across the Ocean</h2>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+                <button class="glow-btn" onclick="sendKiss()">Virtual Kiss</button>
+                <button class="glow-btn" style="background: white; color: black;" onclick="sendHug()">Virtual Hug</button>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align:center; padding:80px; opacity:0.4; font-size:0.8rem;">
+    Handcrafted with ❤️ by Mihir for Manahil <br> Valentine's Day 2026
+    </footer>
+</div>
+
+<script>
+    // 1. NAVIGATION LOGIC
+    function moveNo() {
+        const noBtn = document.getElementById('no-btn');
+        const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
+        const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
+        noBtn.style.position = "fixed";
+        noBtn.style.left = x + "px";
+        noBtn.style.top = y + "px";
+    }
+
+    function handleNoClick() {
+        const noBtn = document.getElementById('no-btn');
+        noBtn.innerHTML = "YES";
+        noBtn.style.background = "#ff2d55";
+        setTimeout(showPasswordScreen, 500);
+    }
+
+    function showPasswordScreen() {
+        const ask = document.getElementById('ask-screen');
+        const pass = document.getElementById('password-screen');
+        ask.style.opacity = '0';
+        setTimeout(() => {
+            ask.style.display = 'none';
+            pass.style.display = 'flex';
+            setTimeout(() => pass.style.opacity = '1', 50);
+        }, 1000);
+    }
+
+    function checkPassword() {
+        const input = document.getElementById('passInput').value;
+        if(input === "22JanForever") {
+            unlockEverything();
+        } else {
+            alert("Wrong password, my love. Try again? ❤️");
+        }
+    }
+
+    function unlockEverything() {
+        const pass = document.getElementById('password-screen');
+        const main = document.getElementById('main-content');
+        pass.style.opacity = '0';
+        setTimeout(() => {
+            pass.style.display = 'none';
+            main.style.visibility = 'visible';
+            main.style.opacity = '1';
+            document.body.style.overflow = 'auto';
+            initHearts();
+        }, 1000);
+    }
+
+    // 2. THE EXTRAS (COUNTDOWN, HEARTS, OVERLAYS)
+    const targetDate = new Date("February 14, 2026 00:00:00").getTime();
+    setInterval(() => {
+        const now = new Date().getTime();
+        const diff = targetDate - now;
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        document.getElementById("countdown").innerHTML = `${d}D : ${h}H : ${m}M : ${s}S UNTIL VALENTINE'S`;
+    }, 1000);
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let hearts = [];
+
+    function initHearts() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        for (let i = 0; i < 60; i++) {
+            hearts.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 6 + 2,
+                speed: Math.random() * 1 + 0.3,
+                opacity: Math.random() * 0.5 + 0.2
+            });
+        }
+        animate();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        hearts.forEach(h => {
+            ctx.fillStyle = `rgba(255, 45, 85, ${h.opacity})`;
+            ctx.beginPath();
+            ctx.arc(h.x, h.y, h.size, 0, Math.PI * 2);
+            ctx.fill();
+            h.y -= h.speed;
+            if (h.y < -10) h.y = canvas.height + 10;
+        });
+        requestAnimationFrame(animate);
+    }
+
+    function sendKiss() { triggerOverlay('kiss-overlay', "A kiss landed in your country! 💋"); }
+    function sendHug() { triggerOverlay('hug-overlay', "A giant warm hug has wrapped around you! ❤️"); }
+
+    function triggerOverlay(id, msg) {
+        const el = document.getElementById(id);
+        el.style.transform = "translate(-50%, -50%) scale(2)";
+        el.style.opacity = "1";
+        setTimeout(() => {
+            el.style.transform = "translate(-50%, -50%) scale(0)";
+            el.style.opacity = "0";
+            setTimeout(() => alert(msg), 300);
+        }, 1200);
+    }
+</script>
+</body>
+</html>
